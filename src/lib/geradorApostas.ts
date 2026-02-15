@@ -25,16 +25,21 @@ function scoreHumanidade(aposta: number[]): number {
   let score = 0;
   const sorted = [...aposta].sort((a, b) => a - b);
 
-  let maxSeq = 1, currentSeq = 1;
-  for (let i = 1; i < sorted.length; i++) {
-    if (sorted[i] === sorted[i - 1] + 1) {
-      currentSeq++;
-      maxSeq = Math.max(maxSeq, currentSeq);
-    } else {
-      currentSeq = 1;
+  // Only penalize sequences longer than 3 (matching official motor V2)
+  let maxSeq = 0, currentSeq = 1;
+  if (sorted.length > 1) {
+    for (let i = 1; i < sorted.length; i++) {
+      if (sorted[i] === sorted[i - 1] + 1) {
+        currentSeq++;
+      } else {
+        maxSeq = Math.max(maxSeq, currentSeq);
+        currentSeq = 1;
+      }
     }
+    maxSeq = Math.max(maxSeq, currentSeq);
   }
-  score += Math.min(maxSeq * 10, 40);
+  if (maxSeq > 3) score += (maxSeq - 3) * 10;
+
   score += aposta.filter(n => n % 5 === 0).length * 5;
 
   const gradeSimetria = new Set([1, 5, 21, 25, 3, 13, 23]);
@@ -253,7 +258,7 @@ export function gerarConjuntoOtimizado(
     soma_max: 230,
     repetidos_min: 6,
     repetidos_max: 11,
-    humanidade_max: 70,
+    humanidade_max: 80,
   };
 
   const apostas = motorFechamentoGuloso(
