@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense } from "react";
 import { motion } from "framer-motion";
 import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings } from "lucide-react";
 import { Toaster, toast } from "sonner";
@@ -16,7 +16,7 @@ import CoverageDisplay from "@/components/CoverageDisplay";
 import BetCardV2 from "@/components/BetCardV2";
 import BacktestV2Section from "@/components/BacktestV2Section";
 import ManualUniverseSelector from "@/components/ManualUniverseSelector";
-import ExportButtons from "@/components/ExportButtons";
+const ExportButtons = lazy(() => import("@/components/ExportButtons"));
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 
@@ -265,7 +265,9 @@ const Index = () => {
                   ))}
                 </div>
 
-                <ExportButtons targetId="apostas-export" />
+                <Suspense fallback={<div className="text-center font-mono text-xs text-muted-foreground">Carregando exportação...</div>}>
+                  <ExportButtons targetId="apostas-export" />
+                </Suspense>
               </>
             )}
 
