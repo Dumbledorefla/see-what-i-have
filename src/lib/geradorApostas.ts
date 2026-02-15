@@ -271,6 +271,6 @@ export function gerarConjuntoOtimizado(
     total_trios: totalTrios,
     cobertura_final_pct: coberturaFinal,
     apostas,
-    custo_total: nApostas * 3,
+    custo_total: nApostas * 3.5,
   };
 }
