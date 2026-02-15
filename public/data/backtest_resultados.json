@@ -1,0 +1,28 @@
+{
+  "estrategia_otimizada": {
+    "roi": -69.1020202020202,
+    "retorno_total": 30589.0,
+    "custo_total": 99000.0,
+    "acertos": {
+      "11": 3312,
+      "12": 703,
+      "13": 71,
+      "14": 0,
+      "15": 0
+    },
+    "concursos_com_premio_pct": 48.8
+  },
+  "baseline_medio": {
+    "roi": -72.463298989899,
+    "retorno_total": 27261.334000000003,
+    "acertos_13": 46.0,
+    "acertos_14": 1.4,
+    "concursos_com_premio_pct": 97.45
+  },
+  "alpha": {
+    "roi": 3.3612787878788026,
+    "retorno": 3327.6659999999974,
+    "acertos_13": 25.0,
+    "acertos_14": -1.4
+  }
+}
