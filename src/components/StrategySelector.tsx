@@ -8,7 +8,7 @@ interface StrategySelectorProps {
 
 const strategies: { id: Estrategia; label: string; desc: string; icon: typeof Shield }[] = [
   { id: "conservadora", label: "Conservadora", desc: "Top 18 mais frequentes", icon: Shield },
-  { id: "balanceada", label: "Balanceada", desc: "Mix frequentes + intermediárias", icon: Target },
+  { id: "balanceada", label: "Balanceada", desc: "12 frequentes + 6 intermediárias", icon: Target },
   { id: "agressiva", label: "Agressiva", desc: "Frequentes + atrasadas", icon: Flame },
   { id: "manual", label: "Manual", desc: "Escolha suas dezenas", icon: Wrench },
 ];

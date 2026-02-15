@@ -81,6 +81,16 @@ export interface FrequenciaNumero {
   percentual: number;
 }
 
+export interface Filtros {
+  pares_min: number;
+  pares_max: number;
+  soma_min: number;
+  soma_max: number;
+  repetidos_min: number;
+  repetidos_max: number;
+  humanidade_max: number;
+}
+
 export function parseCsvCompleto(csvText: string): Sorteio[] {
   const lines = csvText.trim().split('\n');
   return lines.slice(1).map(line => {
