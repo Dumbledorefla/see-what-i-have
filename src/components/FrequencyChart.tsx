@@ -16,7 +16,7 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
         FREQUÊNCIA DOS NÚMEROS
       </h3>
       <p className="text-muted-foreground text-sm mb-4">
-        Aparições nos últimos 300 sorteios
+        Aparições em todos os concursos
       </p>
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
