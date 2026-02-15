@@ -2,6 +2,13 @@ import { motion } from "framer-motion";
 import { FlaskConical, TrendingUp, TrendingDown } from "lucide-react";
 import type { BacktestV2Result } from "@/lib/lotofacilData";
 
+const formatCurrency = (value: number) => {
+  return value.toLocaleString("pt-BR", {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+};
+
 interface BacktestV2SectionProps {
   data: BacktestV2Result;
 }
@@ -34,7 +41,7 @@ const BacktestV2Section = ({ data }: BacktestV2SectionProps) => {
             <p className="text-xs font-mono text-muted-foreground">p.p. ROI (Alpha)</p>
           </div>
           <div>
-            <p className="text-2xl font-mono font-bold text-accent">+R${alpha.retorno.toFixed(0)}</p>
+            <p className="text-2xl font-mono font-bold text-accent">+R${formatCurrency(alpha.retorno)}</p>
             <p className="text-xs font-mono text-muted-foreground">Retorno extra</p>
           </div>
           <div>
@@ -66,11 +73,11 @@ const BacktestV2Section = ({ data }: BacktestV2SectionProps) => {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Retorno total</span>
-              <span className="text-foreground">R${eo.retorno_total.toLocaleString("pt-BR")}</span>
+              <span className="text-foreground">R${formatCurrency(eo.retorno_total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Custo total</span>
-              <span className="text-foreground">R${eo.custo_total.toLocaleString("pt-BR")}</span>
+              <span className="text-foreground">R${formatCurrency(eo.custo_total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Acertos 13+</span>
@@ -103,7 +110,7 @@ const BacktestV2Section = ({ data }: BacktestV2SectionProps) => {
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Retorno total</span>
-              <span className="text-foreground">R${bl.retorno_total.toLocaleString("pt-BR")}</span>
+              <span className="text-foreground">R${formatCurrency(bl.retorno_total)}</span>
             </div>
             <div className="flex justify-between">
               <span className="text-muted-foreground">Acertos 13+</span>

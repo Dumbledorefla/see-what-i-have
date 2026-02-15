@@ -3,7 +3,7 @@
  * Portado do Python motor_cobertura.py + gerador_v2.py
  */
 
-import type { AnaliseCompleta } from "./lotofacilData";
+import type { AnaliseCompleta, Filtros } from "./lotofacilData";
 
 // --- Filtros ---
 
@@ -61,16 +61,6 @@ function shuffleArray<T>(arr: T[]): T[] {
 
 export type Estrategia = "conservadora" | "balanceada" | "agressiva" | "manual";
 
-interface Filtros {
-  pares_min: number;
-  pares_max: number;
-  soma_min: number;
-  soma_max: number;
-  repetidos_min: number;
-  repetidos_max: number;
-  humanidade_max: number;
-}
-
 export interface ApostaV2 {
   id: number;
   dezenas: number[];
@@ -91,15 +81,6 @@ export interface ConjuntoOtimizado {
   custo_total: number;
 }
 
-// Keep old interface for backward compat
-export interface ApostaIntelligente {
-  dezenas: number[];
-  pares: number;
-  soma: number;
-  faixas: number[];
-  humanidade_score: number;
-}
-
 // --- Seleção de universo ---
 
 export function selecionarUniverso(
@@ -114,16 +95,23 @@ export function selecionarUniverso(
   switch (estrategia) {
     case "conservadora":
       return freqOrdenada.slice(0, 18);
-    case "balanceada":
-      return freqOrdenada.slice(0, 18); // top 18 by freq
+
+    case "balanceada": {
+      const top12 = freqOrdenada.slice(0, 12);
+      const intermediarias = freqOrdenada.slice(12, 25);
+      const bottom6 = shuffleArray(intermediarias).slice(0, 6);
+      return [...new Set([...top12, ...bottom6])].sort((a, b) => a - b);
+    }
+
     case "agressiva": {
       const atrasadasOrdenadas = Object.entries(analise.atrasos_atuais)
         .sort(([, a], [, b]) => b - a)
         .map(([num]) => parseInt(num));
       const top12 = freqOrdenada.slice(0, 12);
       const atrasadas6 = atrasadasOrdenadas.filter(n => !top12.includes(n)).slice(0, 6);
-      return [...new Set([...top12, ...atrasadas6])];
+      return [...new Set([...top12, ...atrasadas6])].sort((a, b) => a - b);
     }
+
     case "manual":
       if (universoManual && universoManual.length >= 18) return universoManual;
       return freqOrdenada.slice(0, 18);
@@ -156,8 +144,7 @@ function gerarApostaCandidata(
   return null;
 }
 
-// --- Trio key helper (for coverage tracking) ---
-// Instead of storing all C(15,3) = 455 trios as tuples, use string keys
+// --- Trio key helper ---
 
 function getTrioKeys(aposta: number[]): Set<string> {
   const keys = new Set<string>();
@@ -173,12 +160,13 @@ function getTrioKeys(aposta: number[]): Set<string> {
 
 function getTotalTrios(universo: number[]): number {
   const n = universo.length;
+  if (n < 3) return 0;
   return (n * (n - 1) * (n - 2)) / 6;
 }
 
 // --- Motor de Fechamento Guloso ---
 
-export function motorFechamentoGuloso(
+function motorFechamentoGuloso(
   universo: number[],
   nApostas: number,
   ultimoConcursoSet: Set<number>,
@@ -210,7 +198,6 @@ export function motorFechamentoGuloso(
     }
 
     if (!melhorAposta) {
-      // Fallback: random from universe
       melhorAposta = shuffleArray(sortedUniverso).slice(0, 15).sort((a, b) => a - b);
       const trios = getTrioKeys(melhorAposta);
       melhorNovos = new Set<string>();
@@ -246,12 +233,13 @@ export function gerarConjuntoOtimizado(
   analise: AnaliseCompleta,
   ultimoConcursoDezenas: number[],
   universoManual?: number[],
-  onProgress?: (i: number, total: number) => void
+  onProgress?: (i: number, total: number) => void,
+  filtros?: Filtros
 ): ConjuntoOtimizado {
   const universo = selecionarUniverso(estrategia, analise, universoManual);
   const ultimoSet = new Set(ultimoConcursoDezenas);
 
-  const filtros: Filtros = {
+  const defaultFiltros: Filtros = {
     pares_min: 5,
     pares_max: 10,
     soma_min: 160,
@@ -261,11 +249,13 @@ export function gerarConjuntoOtimizado(
     humanidade_max: 80,
   };
 
+  const filtrosAtuais = filtros || defaultFiltros;
+
   const apostas = motorFechamentoGuloso(
     universo,
     nApostas,
     ultimoSet,
-    filtros,
+    filtrosAtuais,
     200,
     onProgress
   );
@@ -283,46 +273,4 @@ export function gerarConjuntoOtimizado(
     apostas,
     custo_total: nApostas * 3,
   };
-}
-
-// Keep backward compat
-export function gerarApostasInteligentes(
-  ultimoConcursoDezenas: number[],
-  nApostas: number = 3
-): ApostaIntelligente[] {
-  const ultimoSet = new Set(ultimoConcursoDezenas);
-  const result: ApostaIntelligente[] = [];
-  let iterations = 0;
-
-  while (result.length < nApostas && iterations < 50000) {
-    iterations++;
-    const all = Array.from({ length: 25 }, (_, i) => i + 1);
-    const aposta = shuffleArray(all).slice(0, 15).sort((a, b) => a - b);
-
-    const pares = countPares(aposta);
-    if (pares < 5 || pares > 9) continue;
-
-    const soma = getSoma(aposta);
-    if (soma < 170 || soma > 220) continue;
-
-    if (scoreHumanidade(aposta) > 60) continue;
-
-    const overlap = aposta.filter(n => ultimoSet.has(n)).length;
-    if (overlap < 6 || overlap > 11) continue;
-
-    const tooSimilar = result.some(e => {
-      const eSet = new Set(e.dezenas);
-      return aposta.filter(n => eSet.has(n)).length > 12;
-    });
-    if (tooSimilar) continue;
-
-    result.push({
-      dezenas: aposta,
-      pares,
-      soma,
-      faixas: getFaixas(aposta),
-      humanidade_score: scoreHumanidade(aposta),
-    });
-  }
-  return result;
 }

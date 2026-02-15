@@ -1,19 +1,24 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion } from "framer-motion";
-import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2 } from "lucide-react";
-import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, type Sorteio, type AnaliseCompleta, type BacktestV2Result } from "@/lib/lotofacilData";
+import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings } from "lucide-react";
+import { Toaster, toast } from "sonner";
+import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, calcularDistribuicaoSoma, type Sorteio, type AnaliseCompleta, type BacktestV2Result, type Filtros } from "@/lib/lotofacilData";
 import { gerarConjuntoOtimizado, type Estrategia, type ConjuntoOtimizado } from "@/lib/geradorApostas";
 import StatsOverview from "@/components/StatsOverview";
 import FrequencyChart from "@/components/FrequencyChart";
 import ParityChart from "@/components/ParityChart";
+import SomaChart from "@/components/SomaChart";
+import AtrasoChart from "@/components/AtrasoChart";
 import HistoryTable from "@/components/HistoryTable";
-import NumberGrid from "@/components/NumberGrid";
 import StrategySelector from "@/components/StrategySelector";
 import BudgetInput from "@/components/BudgetInput";
 import CoverageDisplay from "@/components/CoverageDisplay";
 import BetCardV2 from "@/components/BetCardV2";
 import BacktestV2Section from "@/components/BacktestV2Section";
 import ManualUniverseSelector from "@/components/ManualUniverseSelector";
+import ExportButtons from "@/components/ExportButtons";
+import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { Progress } from "@/components/ui/progress";
 
 type Tab = "gerar" | "analise" | "historico" | "backtest";
 
@@ -29,6 +34,15 @@ const Index = () => {
   const [isGenerating, setIsGenerating] = useState(false);
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [filtros, setFiltros] = useState<Filtros>({
+    pares_min: 5,
+    pares_max: 10,
+    soma_min: 160,
+    soma_max: 230,
+    repetidos_min: 6,
+    repetidos_max: 11,
+    humanidade_max: 80,
+  });
 
   useEffect(() => {
     Promise.all([
@@ -48,13 +62,15 @@ const Index = () => {
 
   const handleGerar = useCallback(() => {
     if (sorteios.length === 0 || !analise) return;
-    if (estrategia === "manual" && manualUniverse.length < 18) return;
+    if (estrategia === "manual" && manualUniverse.length < 18) {
+      toast.error("Selecione pelo menos 18 dezenas para o universo manual.");
+      return;
+    }
 
     setIsGenerating(true);
     setProgress(0);
     setConjunto(null);
 
-    // Run in setTimeout to not block UI
     setTimeout(() => {
       const ultimo = sorteios[sorteios.length - 1];
       const result = gerarConjuntoOtimizado(
@@ -63,15 +79,18 @@ const Index = () => {
         analise,
         ultimo.dezenas,
         estrategia === "manual" ? manualUniverse : undefined,
-        (i, total) => setProgress(Math.round((i / total) * 100))
+        (i, total) => setProgress(Math.round((i / total) * 100)),
+        filtros
       );
       setConjunto(result);
       setIsGenerating(false);
+      toast.success(`${result.apostas.length} apostas geradas com ${result.cobertura_final_pct.toFixed(1)}% de cobertura!`);
     }, 50);
-  }, [sorteios, analise, estrategia, nApostas, manualUniverse]);
+  }, [sorteios, analise, estrategia, nApostas, manualUniverse, filtros]);
 
   const frequencias = sorteios.length > 0 ? calcularFrequencias(sorteios) : [];
   const paridade = sorteios.length > 0 ? calcularDistribuicaoParidade(sorteios) : [];
+  const distribuicaoSoma = sorteios.length > 0 ? calcularDistribuicaoSoma(sorteios) : null;
   const ultimoSorteio = sorteios.length > 0 ? sorteios[sorteios.length - 1] : null;
 
   const tabs: { id: Tab; label: string; icon: typeof Zap }[] = [
@@ -102,7 +121,7 @@ const Index = () => {
             <div>
               <h1 className="font-mono font-bold text-lg text-foreground tracking-tight">
                 LOTOFÁCIL<span className="text-primary">.AI</span>
-                <span className="text-xs ml-2 px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">V2</span>
+                <span className="text-xs ml-2 px-1.5 py-0.5 rounded bg-primary/10 text-primary border border-primary/20">V3</span>
               </h1>
               <p className="text-xs text-muted-foreground font-mono">
                 Motor de Cobertura Combinatória
@@ -120,8 +139,8 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Tabs */}
-      <nav className="border-b border-border bg-card/50">
+      {/* Tabs - Sticky */}
+      <nav className="border-b border-border bg-card/50 sticky top-0 z-40 backdrop-blur-sm">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto">
             {tabs.map(tab => (
@@ -153,7 +172,7 @@ const Index = () => {
           <motion.div key="gerar" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
             <div className="stat-card text-center py-6">
               <h2 className="text-2xl sm:text-3xl font-mono font-bold text-foreground mb-2">
-                Motor de <span className="text-primary text-glow-primary">Cobertura V2</span>
+                Motor de <span className="text-primary text-glow-primary">Cobertura V3</span>
               </h2>
               <p className="text-muted-foreground max-w-xl mx-auto mb-2 text-sm">
                 Algoritmo de fechamento guloso que gera apostas coordenadas, maximizando a
@@ -170,7 +189,48 @@ const Index = () => {
 
             <BudgetInput value={orcamento} onChange={setOrcamento} />
 
-            <div className="text-center">
+            {/* Filtros Avançados */}
+            <Accordion type="single" collapsible>
+              <AccordionItem value="filtros">
+                <AccordionTrigger>
+                  <div className="flex items-center gap-2 font-mono text-sm">
+                    <Settings className="w-4 h-4" />
+                    Filtros Avançados
+                  </div>
+                </AccordionTrigger>
+                <AccordionContent>
+                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 stat-card">
+                    <div>
+                      <label className="text-xs font-mono text-muted-foreground">Pares (min-max)</label>
+                      <div className="flex gap-1 mt-1">
+                        <input type="number" min={0} max={15} value={filtros.pares_min} onChange={e => setFiltros(f => ({...f, pares_min: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                        <input type="number" min={0} max={15} value={filtros.pares_max} onChange={e => setFiltros(f => ({...f, pares_max: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-mono text-muted-foreground">Soma (min-max)</label>
+                      <div className="flex gap-1 mt-1">
+                        <input type="number" value={filtros.soma_min} onChange={e => setFiltros(f => ({...f, soma_min: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                        <input type="number" value={filtros.soma_max} onChange={e => setFiltros(f => ({...f, soma_max: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-mono text-muted-foreground">Repetidos (min-max)</label>
+                      <div className="flex gap-1 mt-1">
+                        <input type="number" min={0} max={15} value={filtros.repetidos_min} onChange={e => setFiltros(f => ({...f, repetidos_min: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                        <input type="number" min={0} max={15} value={filtros.repetidos_max} onChange={e => setFiltros(f => ({...f, repetidos_max: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground" />
+                      </div>
+                    </div>
+                    <div>
+                      <label className="text-xs font-mono text-muted-foreground">Humanidade máx.</label>
+                      <input type="number" min={0} max={100} value={filtros.humanidade_max} onChange={e => setFiltros(f => ({...f, humanidade_max: +e.target.value}))} className="w-full bg-secondary rounded px-2 py-1 text-xs font-mono text-foreground mt-1" />
+                    </div>
+                  </div>
+                </AccordionContent>
+              </AccordionItem>
+            </Accordion>
+
+            <div className="text-center space-y-2">
               <button
                 onClick={handleGerar}
                 disabled={isGenerating || (estrategia === "manual" && manualUniverse.length < 18)}
@@ -188,17 +248,24 @@ const Index = () => {
                   </>
                 )}
               </button>
+              {isGenerating && (
+                <div className="max-w-md mx-auto">
+                  <Progress value={progress} className="h-2" />
+                </div>
+              )}
             </div>
 
             {conjunto && (
               <>
                 <CoverageDisplay conjunto={conjunto} />
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div id="apostas-export" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {conjunto.apostas.map(aposta => (
                     <BetCardV2 key={aposta.id} aposta={aposta} />
                   ))}
                 </div>
+
+                <ExportButtons targetId="apostas-export" />
               </>
             )}
 
@@ -222,6 +289,9 @@ const Index = () => {
             <FrequencyChart frequencias={frequencias} />
             <div className="grid md:grid-cols-2 gap-6">
               <ParityChart data={paridade} />
+              {distribuicaoSoma && <SomaChart data={distribuicaoSoma.distribuicao} media={distribuicaoSoma.media} />}
+            </div>
+            <div className="grid md:grid-cols-2 gap-6">
               <div className="stat-card">
                 <h3 className="font-mono font-bold text-primary text-lg mb-1">
                   TOP 10 — MAIS FREQUENTES
@@ -255,6 +325,7 @@ const Index = () => {
                     ))}
                 </div>
               </div>
+              {analise && <AtrasoChart atrasos={analise.atrasos_atuais} />}
             </div>
           </motion.div>
         )}
@@ -281,12 +352,19 @@ const Index = () => {
       {/* Footer */}
       <footer className="border-t border-border mt-16">
         <div className="container max-w-6xl mx-auto px-4 py-6 text-center">
+          {ultimoSorteio && (
+            <p className="text-xs font-mono text-muted-foreground mb-1">
+              Dados atualizados até o concurso #{ultimoSorteio.concurso} ({ultimoSorteio.data})
+            </p>
+          )}
           <p className="text-xs font-mono text-muted-foreground">
-            LOTOFÁCIL.AI V2 — Motor de Cobertura Combinatória • {sorteios.length} concursos •
+            LOTOFÁCIL.AI V3 — Motor de Cobertura Combinatória • {sorteios.length} concursos •
             Não é previsão, é otimização
           </p>
         </div>
       </footer>
+
+      <Toaster />
     </div>
   );
 };
