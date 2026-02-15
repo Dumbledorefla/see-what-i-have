@@ -6,7 +6,7 @@ interface BudgetInputProps {
 }
 
 const BudgetInput = ({ value, onChange }: BudgetInputProps) => {
-  const nApostas = Math.floor(value / 3);
+  const nApostas = Math.floor(value / 3.5);
 
   return (
     <div className="stat-card flex flex-col sm:flex-row items-start sm:items-center gap-4">
@@ -29,7 +29,7 @@ const BudgetInput = ({ value, onChange }: BudgetInputProps) => {
       </div>
       <div className="text-right">
         <p className="text-2xl font-mono font-bold text-primary">{nApostas}</p>
-        <p className="text-xs font-mono text-muted-foreground">apostas × R$3,00</p>
+        <p className="text-xs font-mono text-muted-foreground">apostas × R$3,50</p>
       </div>
     </div>
   );

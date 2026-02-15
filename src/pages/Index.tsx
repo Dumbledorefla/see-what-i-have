@@ -58,7 +58,7 @@ const Index = () => {
     });
   }, []);
 
-  const nApostas = Math.floor(orcamento / 3);
+  const nApostas = Math.floor(orcamento / 3.5);
 
   const handleGerar = useCallback(() => {
     if (sorteios.length === 0 || !analise) return;
