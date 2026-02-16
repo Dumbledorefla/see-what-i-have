@@ -185,3 +185,88 @@ export function calcularDistribuicaoSoma(sorteios: Sorteio[]) {
       .sort((a, b) => parseInt(a.faixa) - parseInt(b.faixa)),
   };
 }
+
+// MELHORIA 3: Calcula AnaliseCompleta a partir dos sorteios
+export function calcularAnaliseCompleta(sorteios: Sorteio[]): AnaliseCompleta {
+  const total = sorteios.length;
+
+  // Frequência de cada número
+  const freqMap: Record<string, number> = {};
+  for (let i = 1; i <= 25; i++) freqMap[String(i)] = 0;
+  sorteios.forEach(s => s.dezenas.forEach(d => { freqMap[String(d)]++; }));
+
+  const frequencia_esperada = parseFloat(((total * 15) / 25).toFixed(2));
+
+  // Paridade
+  const paresArr = sorteios.map(s => s.dezenas.filter(d => d % 2 === 0).length);
+  const mediaPares = paresArr.reduce((a, b) => a + b, 0) / total;
+  const dpPares = Math.sqrt(paresArr.reduce((sum, p) => sum + (p - mediaPares) ** 2, 0) / total);
+  const distPares: Record<string, number> = {};
+  paresArr.forEach(p => { distPares[String(p)] = (distPares[String(p)] || 0) + 1; });
+
+  // Soma
+  const somas = sorteios.map(s => s.dezenas.reduce((a, b) => a + b, 0));
+  const mediaSoma = somas.reduce((a, b) => a + b, 0) / total;
+  const dpSoma = Math.sqrt(somas.reduce((sum, s) => sum + (s - mediaSoma) ** 2, 0) / total);
+  const sortedSomas = [...somas].sort((a, b) => a - b);
+  const mediana = sortedSomas[Math.floor(total / 2)];
+
+  // Repetição com concurso anterior
+  const reps: number[] = [];
+  for (let i = 1; i < sorteios.length; i++) {
+    const prev = new Set(sorteios[i - 1].dezenas);
+    const rep = sorteios[i].dezenas.filter(d => prev.has(d)).length;
+    reps.push(rep);
+  }
+  const mediaRep = reps.length > 0 ? reps.reduce((a, b) => a + b, 0) / reps.length : 0;
+  const dpRep = reps.length > 0 ? Math.sqrt(reps.reduce((sum, r) => sum + (r - mediaRep) ** 2, 0) / reps.length) : 0;
+  const distRep: Record<string, number> = {};
+  reps.forEach(r => { distRep[String(r)] = (distRep[String(r)] || 0) + 1; });
+
+  // Atrasos atuais
+  const atrasos: Record<string, number> = {};
+  const ultimoConcursoIdx = sorteios.length - 1;
+  for (let num = 1; num <= 25; num++) {
+    let atraso = 0;
+    for (let i = ultimoConcursoIdx; i >= 0; i--) {
+      if (sorteios[i].dezenas.includes(num)) break;
+      atraso++;
+    }
+    atrasos[String(num)] = atraso;
+  }
+
+  // Probabilidades (frequência relativa)
+  const probabilidades: Record<string, number> = {};
+  for (let i = 1; i <= 25; i++) {
+    probabilidades[String(i)] = parseFloat((freqMap[String(i)] / total).toFixed(6));
+  }
+
+  return {
+    total_concursos: total,
+    frequencia_numeros: freqMap,
+    frequencia_esperada,
+    paridade: {
+      media_pares: parseFloat(mediaPares.toFixed(2)),
+      desvio_padrao: parseFloat(dpPares.toFixed(2)),
+      distribuicao: distPares,
+    },
+    soma: {
+      minima: Math.min(...somas),
+      maxima: Math.max(...somas),
+      media: parseFloat(mediaSoma.toFixed(2)),
+      mediana,
+      desvio_padrao: parseFloat(dpSoma.toFixed(2)),
+      intervalo_1sigma: [
+        parseFloat((mediaSoma - dpSoma).toFixed(2)),
+        parseFloat((mediaSoma + dpSoma).toFixed(2)),
+      ],
+    },
+    repeticao_anterior: {
+      media: parseFloat(mediaRep.toFixed(2)),
+      desvio_padrao: parseFloat(dpRep.toFixed(2)),
+      distribuicao: distRep,
+    },
+    atrasos_atuais: atrasos,
+    probabilidades,
+  };
+}
