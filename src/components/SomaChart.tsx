@@ -19,10 +19,10 @@ const SomaChart = ({ data, media }: SomaChartProps) => {
       <div className="h-64">
         <ResponsiveContainer width="100%" height="100%">
           <BarChart data={data}>
-            <XAxis dataKey="faixa" tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
-            <YAxis tick={{ fill: "hsl(var(--muted-foreground))", fontSize: 10 }} />
+            <XAxis dataKey="faixa" tick={{ fill: "hsl(215 20% 50%)", fontSize: 10 }} />
+            <YAxis tick={{ fill: "hsl(215 20% 50%)", fontSize: 10 }} />
             <Tooltip
-              contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 8 }}
+              contentStyle={{ background: "hsl(224 71% 8%)", border: "1px solid hsl(217 33% 22%)", borderRadius: 8 }}
               formatter={(value: number) => [`${value}x`, "Frequência"]}
               labelFormatter={(label) => `Faixa ${label}`}
             />
@@ -33,7 +33,7 @@ const SomaChart = ({ data, media }: SomaChartProps) => {
                 return (
                   <Cell
                     key={entry.faixa}
-                    fill={isMediaRange ? "hsl(var(--accent))" : "hsl(var(--primary))"}
+                    fill={isMediaRange ? "hsl(160 100% 39%)" : "hsl(262 84% 60%)"}
                     opacity={isMediaRange ? 1 : 0.6}
                   />
                 );

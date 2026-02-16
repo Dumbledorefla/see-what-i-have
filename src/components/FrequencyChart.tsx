@@ -23,25 +23,24 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
           <BarChart data={sorted} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
             <XAxis
               dataKey="numero"
-              tick={{ fill: "hsl(220 10% 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
-              axisLine={{ stroke: "hsl(220 14% 18%)" }}
+              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
+              axisLine={{ stroke: "hsl(217 33% 22%)" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "hsl(220 10% 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               domain={[minFreq - 5, maxFreq + 5]}
             />
             <Tooltip
               contentStyle={{
-                background: "hsl(220 18% 10%)",
-                border: "1px solid hsl(220 14% 18%)",
+                background: "hsl(224 71% 8%)",
+                border: "1px solid hsl(217 33% 22%)",
                 borderRadius: 8,
-                fontFamily: "JetBrains Mono",
                 fontSize: 12,
               }}
-              labelStyle={{ color: "hsl(142 72% 50%)" }}
+              labelStyle={{ color: "hsl(262 84% 60%)" }}
               formatter={(value: number) => [`${value}x`, "Frequência"]}
               labelFormatter={(label) => `Número ${String(label).padStart(2, "0")}`}
             />
@@ -51,7 +50,7 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
                 return (
                   <Cell
                     key={entry.numero}
-                    fill={`hsl(142 72% ${35 + intensity * 25}%)`}
+                    fill={`hsl(262 84% ${40 + intensity * 25}%)`}
                     opacity={0.6 + intensity * 0.4}
                   />
                 );

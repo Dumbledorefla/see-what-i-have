@@ -20,22 +20,21 @@ const ParityChart = ({ data }: ParityChartProps) => {
           <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
             <XAxis
               dataKey="pares"
-              tick={{ fill: "hsl(220 10% 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
-              axisLine={{ stroke: "hsl(220 14% 18%)" }}
+              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
+              axisLine={{ stroke: "hsl(217 33% 22%)" }}
               tickLine={false}
               tickFormatter={(v) => `${v}P`}
             />
             <YAxis
-              tick={{ fill: "hsl(220 10% 50%)", fontSize: 11, fontFamily: "JetBrains Mono" }}
+              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                background: "hsl(220 18% 10%)",
-                border: "1px solid hsl(220 14% 18%)",
+                background: "hsl(224 71% 8%)",
+                border: "1px solid hsl(217 33% 22%)",
                 borderRadius: 8,
-                fontFamily: "JetBrains Mono",
                 fontSize: 12,
               }}
               formatter={(value: number, _: string, props: any) => [
@@ -48,7 +47,7 @@ const ParityChart = ({ data }: ParityChartProps) => {
               {data.map((entry) => (
                 <Cell
                   key={entry.pares}
-                  fill={entry.frequencia === maxFreq ? "hsl(48 96% 55%)" : "hsl(48 96% 55% / 0.4)"}
+                  fill={entry.frequencia === maxFreq ? "hsl(160 100% 39%)" : "hsl(160 100% 39% / 0.4)"}
                 />
               ))}
             </Bar>
