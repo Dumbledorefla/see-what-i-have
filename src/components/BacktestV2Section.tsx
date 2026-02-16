@@ -22,7 +22,6 @@ interface BacktestV2SectionProps {
 const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) => {
   const { estrategia_otimizada: eo, baseline_medio: bl, alpha } = data;
 
-  // Dynamic backtest state
   const [dynEstrategia, setDynEstrategia] = useState<Estrategia>("balanceada");
   const [dynPeriodo, setDynPeriodo] = useState(100);
   const [dynNApostas, setDynNApostas] = useState(28);
@@ -68,8 +67,8 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
     <div className="space-y-6">
       {/* Dynamic Backtest Controls */}
       <div className="stat-card p-4 space-y-4">
-        <h3 className="font-mono font-bold text-primary text-lg flex items-center gap-2">
-          <FlaskConical className="w-5 h-5" />
+        <h3 className="font-mono font-bold text-foreground text-lg flex items-center gap-2">
+          <FlaskConical className="w-5 h-5 text-accent" />
           BACKTEST DINÂMICO
         </h3>
         <p className="text-muted-foreground text-sm">
@@ -118,7 +117,7 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
           <button
             onClick={handleRunBacktest}
             disabled={isRunning}
-            className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg bg-primary text-primary-foreground font-mono font-bold text-xs transition-all hover:opacity-90 disabled:opacity-50"
+            className="inline-flex items-center justify-center gap-2 px-4 py-1.5 rounded-lg bg-accent text-accent-foreground font-mono font-bold text-xs transition-all hover:opacity-90 disabled:opacity-50"
           >
             {isRunning ? (
               <>
@@ -145,7 +144,7 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
       {dynamicResult && (
         <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
           <div className="stat-card glow-primary text-center py-6">
-            <h3 className="font-mono font-bold text-primary text-lg mb-2">
+            <h3 className="font-mono font-bold text-foreground text-lg mb-2">
               RESULTADO — {dynamicResult.estrategia.toUpperCase()}
             </h3>
             <p className="text-muted-foreground text-xs mb-4">
@@ -153,7 +152,7 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
             </p>
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div>
-                <p className="text-2xl font-mono font-bold text-primary">
+                <p className="text-2xl font-mono font-bold text-accent">
                   {dynamicResult.alpha_roi > 0 ? "+" : ""}{dynamicResult.alpha_roi.toFixed(2)}
                 </p>
                 <p className="text-xs font-mono text-muted-foreground">p.p. Alpha (ROI)</p>
@@ -165,7 +164,7 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
                 <p className="text-xs font-mono text-muted-foreground">Retorno extra</p>
               </div>
               <div>
-                <p className="text-2xl font-mono font-bold text-primary">{dynamicResult.roi.toFixed(2)}%</p>
+                <p className="text-2xl font-mono font-bold text-foreground">{dynamicResult.roi.toFixed(2)}%</p>
                 <p className="text-xs font-mono text-muted-foreground">ROI Otimizado</p>
               </div>
               <div>
@@ -178,8 +177,8 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
           <div className="grid md:grid-cols-2 gap-4">
             <div className="stat-card">
               <div className="flex items-center gap-2 mb-4">
-                <TrendingUp className="w-5 h-5 text-primary" />
-                <h4 className="font-mono font-bold text-primary">OTIMIZADO</h4>
+                <TrendingUp className="w-5 h-5 text-accent" />
+                <h4 className="font-mono font-bold text-foreground">OTIMIZADO</h4>
               </div>
               <div className="space-y-3 text-sm font-mono">
                 <div className="flex justify-between">
@@ -238,19 +237,19 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
         animate={{ opacity: 1, y: 0 }}
         className="stat-card glow-primary text-center py-6"
       >
-        <h3 className="font-mono font-bold text-primary text-xl mb-2">
+        <h3 className="font-mono font-bold text-foreground text-xl mb-2">
           REFERÊNCIA ESTÁTICA
         </h3>
         <p className="text-muted-foreground text-sm max-w-2xl mx-auto mb-6">
           Dados pré-calculados: estratégia de cobertura vs. 1000 sorteios.
           ROI{" "}
-          <span className="text-primary font-bold">{alpha.roi.toFixed(2)} p.p. maior</span>{" "}
+          <span className="text-accent font-bold">{alpha.roi.toFixed(2)} p.p. maior</span>{" "}
           que apostas aleatórias.
         </p>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div>
-            <p className="text-2xl font-mono font-bold text-primary">+{alpha.roi.toFixed(2)}</p>
+            <p className="text-2xl font-mono font-bold text-accent">+{alpha.roi.toFixed(2)}</p>
             <p className="text-xs font-mono text-muted-foreground">p.p. ROI (Alpha)</p>
           </div>
           <div>
@@ -258,7 +257,7 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
             <p className="text-xs font-mono text-muted-foreground">Retorno extra</p>
           </div>
           <div>
-            <p className="text-2xl font-mono font-bold text-primary">+{alpha.acertos_13.toFixed(0)}</p>
+            <p className="text-2xl font-mono font-bold text-accent">+{alpha.acertos_13.toFixed(0)}</p>
             <p className="text-xs font-mono text-muted-foreground">Acertos 13+ a mais</p>
           </div>
           <div>
@@ -271,8 +270,8 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
       <div className="grid md:grid-cols-2 gap-4">
         <motion.div initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} className="stat-card">
           <div className="flex items-center gap-2 mb-4">
-            <TrendingUp className="w-5 h-5 text-primary" />
-            <h4 className="font-mono font-bold text-primary">ESTRATÉGIA OTIMIZADA</h4>
+            <TrendingUp className="w-5 h-5 text-accent" />
+            <h4 className="font-mono font-bold text-foreground">ESTRATÉGIA OTIMIZADA</h4>
           </div>
           <div className="space-y-3 text-sm font-mono">
             <div className="flex justify-between">
@@ -332,10 +331,10 @@ const BacktestV2Section = ({ data, sorteios, filtros }: BacktestV2SectionProps) 
         </motion.div>
       </div>
 
-      <div className="flex items-start gap-3 rounded-lg border border-primary/20 bg-primary/5 p-4">
-        <FlaskConical className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+      <div className="flex items-start gap-3 rounded-lg border border-accent/20 bg-accent/5 p-4">
+        <FlaskConical className="w-5 h-5 text-accent flex-shrink-0 mt-0.5" />
         <div className="text-sm">
-          <p className="font-mono font-bold text-primary mb-1">Sobre o Backtest</p>
+          <p className="font-mono font-bold text-accent mb-1">Sobre o Backtest</p>
           <p className="text-muted-foreground">
             O backtest dinâmico roda em tempo real no seu navegador via Web Worker.
             Para cada concurso no período, apostas são geradas usando o histórico anterior e comparadas

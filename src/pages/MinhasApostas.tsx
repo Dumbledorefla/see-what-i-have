@@ -53,7 +53,7 @@ const MinhasApostas = () => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          <Bookmark className="w-6 h-6 inline-block mr-2 text-primary" />
+          <Bookmark className="w-6 h-6 inline-block mr-2 text-muted-foreground" />
           Minhas Apostas
         </h1>
         <p className="text-muted-foreground text-sm mt-1">

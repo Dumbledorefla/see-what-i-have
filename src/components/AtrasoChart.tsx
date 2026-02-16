@@ -14,7 +14,7 @@ const AtrasoChart = ({ atrasos }: AtrasoChartProps) => {
 
   return (
     <div className="stat-card">
-      <h3 className="font-mono font-bold text-primary text-lg mb-1">
+      <h3 className="font-mono font-bold text-foreground text-lg mb-1">
         TOP 10 — MAIS ATRASADOS
       </h3>
       <p className="text-muted-foreground text-sm mb-4">
@@ -32,7 +32,7 @@ const AtrasoChart = ({ atrasos }: AtrasoChartProps) => {
                   initial={{ width: 0 }}
                   animate={{ width: `${(item.atraso / maxAtraso) * 100}%` }}
                   transition={{ delay: i * 0.05, duration: 0.5 }}
-                  className="h-full rounded-full bg-destructive"
+                  className="h-full rounded-full bg-destructive/70"
                 />
               </div>
             </div>

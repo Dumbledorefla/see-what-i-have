@@ -23,7 +23,7 @@ const ManualUniverseSelector = ({ selected, onChange }: ManualUniverseSelectorPr
           Selecione 18-20 dezenas para seu universo
         </p>
         <span className={`text-xs font-mono font-bold px-2 py-0.5 rounded-full ${
-          selected.length >= 18 ? "bg-primary/10 text-primary" : "bg-destructive/10 text-destructive"
+          selected.length >= 18 ? "bg-accent/10 text-accent" : "bg-destructive/10 text-destructive"
         }`}>
           {selected.length}/25
         </span>

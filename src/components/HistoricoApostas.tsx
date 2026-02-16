@@ -55,7 +55,7 @@ const HistoricoApostas = ({ historico, sorteios, onDelete }: HistoricoApostasPro
           >
             <div className="flex justify-between items-start mb-4">
               <div>
-                <h3 className="font-mono font-bold text-primary text-lg flex items-center gap-2">
+                <h3 className="font-mono font-bold text-foreground text-lg flex items-center gap-2">
                   <Hash className="w-4 h-4" />
                   Apostas para o Concurso #{item.concurso_alvo}
                 </h3>
@@ -77,13 +77,13 @@ const HistoricoApostas = ({ historico, sorteios, onDelete }: HistoricoApostasPro
 
             <div className="mb-4">
               {item.status === 'aguardando' && (
-                <div className="flex items-center gap-2 text-sm font-mono text-amber-400 bg-amber-400/10 border border-amber-400/20 rounded-md px-3 py-2">
+                <div className="flex items-center gap-2 text-sm font-mono text-warning bg-warning/10 border border-warning/20 rounded-md px-3 py-2">
                   <Clock className="w-4 h-4" />
                   Aguardando resultado do concurso #{item.concurso_alvo}
                 </div>
               )}
               {item.status === 'conferido' && item.resultado && (
-                <div className="flex items-center gap-2 text-sm font-mono text-primary bg-primary/10 border border-primary/20 rounded-md px-3 py-2">
+                <div className="flex items-center gap-2 text-sm font-mono text-accent bg-accent/10 border border-accent/20 rounded-md px-3 py-2">
                   <Award className="w-4 h-4" />
                   Conferido! Retorno total:{' '}
                   <span className="font-bold text-lg">

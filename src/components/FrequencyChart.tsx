@@ -12,7 +12,7 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
 
   return (
     <div className="stat-card">
-      <h3 className="font-mono font-bold text-primary text-lg mb-1">
+      <h3 className="font-mono font-bold text-foreground text-lg mb-1">
         FREQUÊNCIA DOS NÚMEROS
       </h3>
       <p className="text-muted-foreground text-sm mb-4">
@@ -23,24 +23,24 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
           <BarChart data={sorted} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
             <XAxis
               dataKey="numero"
-              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
-              axisLine={{ stroke: "hsl(217 33% 22%)" }}
+              tick={{ fill: "hsl(215 20% 55%)", fontSize: 11 }}
+              axisLine={{ stroke: "hsl(217 33% 18%)" }}
               tickLine={false}
             />
             <YAxis
-              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
+              tick={{ fill: "hsl(215 20% 55%)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
               domain={[minFreq - 5, maxFreq + 5]}
             />
             <Tooltip
               contentStyle={{
-                background: "hsl(224 71% 8%)",
-                border: "1px solid hsl(217 33% 22%)",
+                background: "hsl(222 47% 8%)",
+                border: "1px solid hsl(217 33% 18%)",
                 borderRadius: 8,
                 fontSize: 12,
               }}
-              labelStyle={{ color: "hsl(262 84% 60%)" }}
+              labelStyle={{ color: "hsl(160 100% 39%)" }}
               formatter={(value: number) => [`${value}x`, "Frequência"]}
               labelFormatter={(label) => `Número ${String(label).padStart(2, "0")}`}
             />
@@ -50,8 +50,8 @@ const FrequencyChart = ({ frequencias }: FrequencyChartProps) => {
                 return (
                   <Cell
                     key={entry.numero}
-                    fill={`hsl(262 84% ${40 + intensity * 25}%)`}
-                    opacity={0.6 + intensity * 0.4}
+                    fill={`hsl(160 100% ${30 + intensity * 15}%)`}
+                    opacity={0.5 + intensity * 0.5}
                   />
                 );
               })}

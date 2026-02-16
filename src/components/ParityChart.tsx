@@ -9,7 +9,7 @@ const ParityChart = ({ data }: ParityChartProps) => {
 
   return (
     <div className="stat-card">
-      <h3 className="font-mono font-bold text-primary text-lg mb-1">
+      <h3 className="font-mono font-bold text-foreground text-lg mb-1">
         DISTRIBUIÇÃO DE PARIDADE
       </h3>
       <p className="text-muted-foreground text-sm mb-4">
@@ -20,20 +20,20 @@ const ParityChart = ({ data }: ParityChartProps) => {
           <BarChart data={data} margin={{ top: 5, right: 5, bottom: 5, left: -20 }}>
             <XAxis
               dataKey="pares"
-              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
-              axisLine={{ stroke: "hsl(217 33% 22%)" }}
+              tick={{ fill: "hsl(215 20% 55%)", fontSize: 11 }}
+              axisLine={{ stroke: "hsl(217 33% 18%)" }}
               tickLine={false}
               tickFormatter={(v) => `${v}P`}
             />
             <YAxis
-              tick={{ fill: "hsl(215 20% 50%)", fontSize: 11 }}
+              tick={{ fill: "hsl(215 20% 55%)", fontSize: 11 }}
               axisLine={false}
               tickLine={false}
             />
             <Tooltip
               contentStyle={{
-                background: "hsl(224 71% 8%)",
-                border: "1px solid hsl(217 33% 22%)",
+                background: "hsl(222 47% 8%)",
+                border: "1px solid hsl(217 33% 18%)",
                 borderRadius: 8,
                 fontSize: 12,
               }}
@@ -47,7 +47,7 @@ const ParityChart = ({ data }: ParityChartProps) => {
               {data.map((entry) => (
                 <Cell
                   key={entry.pares}
-                  fill={entry.frequencia === maxFreq ? "hsl(160 100% 39%)" : "hsl(160 100% 39% / 0.4)"}
+                  fill={entry.frequencia === maxFreq ? "hsl(160 100% 39%)" : "hsl(160 100% 39% / 0.35)"}
                 />
               ))}
             </Bar>

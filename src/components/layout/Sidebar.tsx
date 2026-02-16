@@ -15,12 +15,12 @@ const links = [
 const Sidebar = () => (
   <aside className="hidden md:flex flex-col w-64 h-screen fixed left-0 top-0 bg-sidebar border-r border-sidebar-border z-50">
     <div className="p-6 flex items-center gap-3">
-      <div className="w-9 h-9 rounded-lg bg-primary/20 flex items-center justify-center">
-        <Clover className="w-5 h-5 text-primary" />
+      <div className="w-9 h-9 rounded-lg bg-accent/20 flex items-center justify-center">
+        <Clover className="w-5 h-5 text-accent" />
       </div>
       <div>
         <h1 className="font-mono font-bold text-base text-foreground tracking-tight">
-          LOTOFÁCIL<span className="text-primary">.AI</span>
+          LOTOFÁCIL<span className="text-accent">.AI</span>
         </h1>
         <p className="text-[10px] text-muted-foreground font-mono">Motor de Cobertura V3</p>
       </div>
@@ -36,7 +36,7 @@ const Sidebar = () => (
             cn(
               "flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition-all duration-200",
               isActive
-                ? "bg-primary/15 text-primary glow-primary"
+                ? "bg-accent/15 text-accent"
                 : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
             )
           }
