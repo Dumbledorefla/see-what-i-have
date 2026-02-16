@@ -1,14 +1,15 @@
 import { motion } from "framer-motion";
-import { Copy, Check } from "lucide-react";
+import { Copy, Check, Award } from "lucide-react";
 import { useState } from "react";
 import NumberGrid from "./NumberGrid";
 import type { ApostaV2 } from "@/lib/geradorApostas";
 
 interface BetCardV2Props {
   aposta: ApostaV2;
+  dezenasSorteadas?: number[];
 }
 
-const BetCardV2 = ({ aposta }: BetCardV2Props) => {
+const BetCardV2 = ({ aposta, dezenasSorteadas = [] }: BetCardV2Props) => {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
@@ -18,19 +19,30 @@ const BetCardV2 = ({ aposta }: BetCardV2Props) => {
     setTimeout(() => setCopied(false), 2000);
   };
 
+  const acertos = dezenasSorteadas.length > 0
+    ? aposta.dezenas.filter(d => dezenasSorteadas.includes(d)).length
+    : 0;
+
+  const isPremiada = acertos >= 11;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: aposta.id * 0.03 }}
-      className="stat-card"
+      className={`stat-card relative overflow-hidden ${isPremiada ? 'glow-primary' : ''}`}
     >
+      {isPremiada && (
+        <div className="absolute top-2 right-2 flex items-center gap-1 text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <Award className="w-3 h-3" /> {acertos} acertos
+        </div>
+      )}
       <div className="flex items-center justify-between mb-3">
         <h4 className="font-mono font-bold text-primary text-sm">
           APOSTA #{String(aposta.id).padStart(2, "0")}
         </h4>
         <div className="flex items-center gap-2">
-          <span className="text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+          <span className={`text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 ${isPremiada ? 'mr-16' : ''}`}>
             H:{aposta.humanidade_score}
           </span>
           <button
@@ -44,7 +56,11 @@ const BetCardV2 = ({ aposta }: BetCardV2Props) => {
       </div>
 
       <div className="mb-3">
-        <NumberGrid activeNumbers={aposta.dezenas} size="sm" />
+        <NumberGrid
+          activeNumbers={aposta.dezenas}
+          highlightedNumbers={dezenasSorteadas}
+          size="sm"
+        />
       </div>
 
       <div className="grid grid-cols-3 gap-2 text-xs font-mono">
