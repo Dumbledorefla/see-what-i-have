@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
 import { LayoutDashboard, Zap, BarChart3, Bookmark, FlaskConical, History, Settings, Clover } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { cn } from "@/lib/utils";
 
 const links = [
@@ -47,10 +48,16 @@ const Sidebar = () => (
       ))}
     </nav>
 
-    <div className="p-4 mx-3 mb-4 rounded-lg border border-border bg-secondary/30">
-      <p className="text-[10px] font-mono text-muted-foreground">
-        Não é previsão, é otimização combinatória.
-      </p>
+    <div className="p-4 mx-3 mb-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <span className="text-[10px] font-mono text-muted-foreground">Tema</span>
+        <ThemeToggle />
+      </div>
+      <div className="rounded-lg border border-border bg-secondary/30 p-3">
+        <p className="text-[10px] font-mono text-muted-foreground">
+          Não é previsão, é otimização combinatória.
+        </p>
+      </div>
     </div>
   </aside>
 );

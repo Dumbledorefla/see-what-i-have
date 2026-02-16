@@ -6,6 +6,62 @@
 
 @layer base {
   :root {
+    /* Tema Claro (Light Mode) */
+    --background: 0 0% 98%;
+    --foreground: 222 47% 11%;
+
+    --card: 0 0% 100%;
+    --card-foreground: 222 47% 11%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 47% 11%;
+
+    --primary: 262 84% 60%;
+    --primary-foreground: 210 40% 98%;
+
+    --secondary: 0 0% 96.1%;
+    --secondary-foreground: 222 47% 11%;
+
+    --muted: 0 0% 96.1%;
+    --muted-foreground: 215 20% 45%;
+
+    --accent: 160 100% 39%;
+    --accent-foreground: 222 47% 5%;
+
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 5%;
+
+    --border: 214 31.8% 91.4%;
+    --input: 214 31.8% 91.4%;
+    --ring: 160 100% 39%;
+
+    --radius: 1rem;
+
+    --sidebar-background: 0 0% 100%;
+    --sidebar-foreground: 222 47% 11%;
+    --sidebar-primary: 160 100% 39%;
+    --sidebar-primary-foreground: 222 47% 5%;
+    --sidebar-accent: 0 0% 96.1%;
+    --sidebar-accent-foreground: 222 47% 11%;
+    --sidebar-border: 214 31.8% 91.4%;
+    --sidebar-ring: 160 100% 39%;
+
+    /* Custom tokens */
+    --glow-primary: 160 100% 39%;
+    --glow-accent: 160 100% 39%;
+    --surface-elevated: 0 0% 100%;
+    --surface-glass: 0 0% 98%;
+    --chart-1: 160 100% 39%;
+    --chart-2: 262 84% 60%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 200 80% 55%;
+    --chart-5: 330 70% 60%;
+  }
+
+  .dark {
     --background: 222 47% 5%;
     --foreground: 210 40% 98%;
 
@@ -37,8 +93,6 @@
     --input: 217 33% 18%;
     --ring: 160 100% 39%;
 
-    --radius: 1rem;
-
     --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 210 40% 98%;
     --sidebar-primary: 160 100% 39%;
@@ -48,7 +102,6 @@
     --sidebar-border: 217 33% 18%;
     --sidebar-ring: 160 100% 39%;
 
-    /* Custom tokens */
     --glow-primary: 160 100% 39%;
     --glow-accent: 160 100% 39%;
     --surface-elevated: 222 47% 10%;
@@ -94,9 +147,9 @@
   }
 
   .glass-card {
-    background: hsl(222 47% 8% / 0.8);
+    background: hsl(var(--card) / 0.8);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(217 33% 18% / 0.6);
+    border: 1px solid hsl(var(--border) / 0.6);
     border-radius: var(--radius);
   }
 
@@ -120,15 +173,15 @@
   }
 
   .number-ball-inactive {
-    background: hsl(217 33% 17%);
-    color: hsl(215 20% 55%);
+    background: hsl(var(--muted));
+    color: hsl(var(--muted-foreground));
   }
 
   .stat-card {
     @apply rounded-xl p-5 border transition-all duration-300;
-    background: hsl(222 47% 8% / 0.8);
+    background: hsl(var(--card) / 0.8);
     backdrop-filter: blur(12px);
-    border-color: hsl(217 33% 18% / 0.6);
+    border-color: hsl(var(--border) / 0.6);
   }
 
   .stat-card:hover {

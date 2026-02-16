@@ -1,4 +1,5 @@
 import { Clover } from "lucide-react";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 const Header = () => (
   <header className="md:hidden sticky top-0 z-50 bg-background/80 backdrop-blur-lg border-b border-border px-4 py-3 flex items-center justify-between">
@@ -10,6 +11,7 @@ const Header = () => (
         LOTOFÁCIL<span className="text-accent">.AI</span>
       </h1>
     </div>
+    <ThemeToggle />
   </header>
 );
 
