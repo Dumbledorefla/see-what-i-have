@@ -2,7 +2,7 @@ import { useState, useEffect, useCallback, lazy, Suspense, useRef } from "react"
 import { motion } from "framer-motion";
 import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings, Bookmark } from "lucide-react";
 import { Toaster, toast } from "sonner";
-import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, calcularDistribuicaoSoma, calcularAnaliseCompleta, type Sorteio, type AnaliseCompleta, type BacktestV2Result, type Filtros } from "@/lib/lotofacilData";
+import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, calcularDistribuicaoSoma, type Sorteio, type AnaliseCompleta, type BacktestV2Result, type Filtros } from "@/lib/lotofacilData";
 import type { Estrategia, ConjuntoOtimizado } from "@/lib/geradorApostas";
 import type { WorkerInput, WorkerOutput } from "@/lib/generation.worker";
 import { useLocalStorage } from "@/lib/hooks";
@@ -62,45 +62,6 @@ const Index = () => {
       }
     };
 
-    const LOTOFACIL_API = "https://api.guidi.dev.br/loteria/lotofacil/concursos";
-
-    const loadFromLocal = () =>
-      Promise.all([
-        fetch("/data/lotofacil_completo.csv").then(r => r.text()),
-        fetch("/data/analise_completa.json").then(r => r.json()),
-      ]).then(([csvText, analiseData]) => {
-        const parsed = parseCsvCompleto(csvText);
-        setSorteios(parsed);
-        setAnalise(analiseData);
-        return parsed;
-      });
-
-    const loadFromApi = () =>
-      fetch(LOTOFACIL_API, { signal: AbortSignal.timeout(8000) })
-        .then(r => { if (!r.ok) throw new Error("API error"); return r.json(); })
-        .then((apiData: any[]) => {
-          const sorteiosApi: Sorteio[] = apiData.map((item: any) => ({
-            concurso: item.concurso || item.numero,
-            data: item.data ? new Date(item.data).toLocaleDateString("pt-BR") : "",
-            dezenas: (item.dezenas || item.listaDezenas || []).map(Number).sort((a: number, b: number) => a - b),
-            acumulado: item.acumulado || false,
-            ganhadores_15: item.ganhadores_15 || item.premiacoes?.[0]?.ganhadores || 0,
-            valor_premio_15: item.valor_premio_15 || item.premiacoes?.[0]?.valorPremio || 0,
-            ganhadores_14: item.ganhadores_14 || 0, valor_premio_14: item.valor_premio_14 || 0,
-            ganhadores_13: item.ganhadores_13 || 0, valor_premio_13: item.valor_premio_13 || 0,
-            ganhadores_12: item.ganhadores_12 || 0, ganhadores_11: item.ganhadores_11 || 0,
-          })).filter((s: Sorteio) => s.dezenas.length === 15)
-            .sort((a: Sorteio, b: Sorteio) => a.concurso - b.concurso);
-
-          if (sorteiosApi.length === 0) throw new Error("API returned no valid data");
-
-          const analiseCalculada = calcularAnaliseCompleta(sorteiosApi);
-          setSorteios(sorteiosApi);
-          setAnalise(analiseCalculada);
-          toast.success(`Dados atualizados via API — ${sorteiosApi.length} concursos`);
-          return sorteiosApi;
-        });
-
     const conferirApostas = (sorteiosConferencia: Sorteio[]) => {
       const saved = JSON.parse(localStorage.getItem('lotofacil-historico') || '[]') as HistoricoConjunto[];
       const aguardando = saved.filter(h => h.status === 'aguardando');
@@ -131,17 +92,21 @@ const Index = () => {
       }
     };
 
-    loadFromApi()
-      .catch(() => {
-        console.warn("API indisponível, usando dados locais");
-        return loadFromLocal();
-      })
-      .then((sorteiosCarregados) => {
-        if (sorteiosCarregados) conferirApostas(sorteiosCarregados);
-      })
-      .finally(() => setLoading(false));
-
-    fetch("/data/backtest_resultados.json").then(r => r.json()).then(setBacktestV2);
+    // Carregamento simplificado — apenas dados locais
+    Promise.all([
+      fetch("/data/lotofacil_completo.csv").then(r => r.text()),
+      fetch("/data/analise_completa.json").then(r => r.json()),
+      fetch("/data/backtest_resultados.json").then(r => r.json()),
+    ]).then(([csvText, analiseData, backtestData]) => {
+      const parsed = parseCsvCompleto(csvText);
+      setSorteios(parsed);
+      setAnalise(analiseData);
+      setBacktestV2(backtestData);
+      conferirApostas(parsed);
+    }).catch(error => {
+      console.error("Erro ao carregar dados locais:", error);
+      toast.error("Falha ao carregar os dados da aplicação.");
+    }).finally(() => setLoading(false));
 
     return () => { workerRef.current?.terminate(); };
   }, []);
