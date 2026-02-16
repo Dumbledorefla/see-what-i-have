@@ -398,7 +398,7 @@ const Index = () => {
         {activeTab === "backtest" && (
           <motion.div key="backtest" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
             {backtestV2 ? (
-              <BacktestV2Section data={backtestV2} />
+              <BacktestV2Section data={backtestV2} sorteios={sorteios} filtros={filtros} />
             ) : (
               <p className="text-muted-foreground text-center font-mono">Carregando dados de backtest...</p>
             )}
