@@ -1,10 +1,11 @@
 import { useState, useEffect, useCallback, lazy, Suspense, useRef } from "react";
 import { motion } from "framer-motion";
-import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings } from "lucide-react";
+import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings, Bookmark } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, calcularDistribuicaoSoma, calcularAnaliseCompleta, type Sorteio, type AnaliseCompleta, type BacktestV2Result, type Filtros } from "@/lib/lotofacilData";
 import type { Estrategia, ConjuntoOtimizado } from "@/lib/geradorApostas";
 import type { WorkerInput, WorkerOutput } from "@/lib/generation.worker";
+import { useLocalStorage } from "@/lib/hooks";
 import StatsOverview from "@/components/StatsOverview";
 import FrequencyChart from "@/components/FrequencyChart";
 import ParityChart from "@/components/ParityChart";
@@ -17,11 +18,14 @@ import CoverageDisplay from "@/components/CoverageDisplay";
 import BetCardV2 from "@/components/BetCardV2";
 import BacktestV2Section from "@/components/BacktestV2Section";
 import ManualUniverseSelector from "@/components/ManualUniverseSelector";
+import HistoricoApostas, { type HistoricoConjunto } from "@/components/HistoricoApostas";
 const ExportButtons = lazy(() => import("@/components/ExportButtons"));
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { Progress } from "@/components/ui/progress";
 
-type Tab = "gerar" | "analise" | "historico" | "backtest";
+const PREMIOS: Record<number, number> = { 11: 6, 12: 12, 13: 30, 14: 1500, 15: 1500000 };
+
+type Tab = "gerar" | "analise" | "historico" | "backtest" | "minhas_apostas";
 
 const Index = () => {
   const [sorteios, setSorteios] = useState<Sorteio[]>([]);
@@ -36,16 +40,12 @@ const Index = () => {
   const [progress, setProgress] = useState(0);
   const [loading, setLoading] = useState(true);
   const [filtros, setFiltros] = useState<Filtros>({
-    pares_min: 5,
-    pares_max: 10,
-    soma_min: 160,
-    soma_max: 230,
-    repetidos_min: 6,
-    repetidos_max: 11,
-    humanidade_max: 80,
+    pares_min: 5, pares_max: 10, soma_min: 160, soma_max: 230,
+    repetidos_min: 6, repetidos_max: 11, humanidade_max: 80,
   });
 
-  // MELHORIA 2: Referência para o Worker
+  const [historicoApostas, setHistoricoApostas] = useLocalStorage<HistoricoConjunto[]>('lotofacil-historico', []);
+
   const workerRef = useRef<Worker | null>(null);
 
   useEffect(() => {
@@ -62,7 +62,6 @@ const Index = () => {
       }
     };
 
-    // MELHORIA 3: Tenta API dinâmica, fallback para dados locais
     const LOTOFACIL_API = "https://api.guidi.dev.br/loteria/lotofacil/concursos";
 
     const loadFromLocal = () =>
@@ -73,6 +72,7 @@ const Index = () => {
         const parsed = parseCsvCompleto(csvText);
         setSorteios(parsed);
         setAnalise(analiseData);
+        return parsed;
       });
 
     const loadFromApi = () =>
@@ -86,12 +86,9 @@ const Index = () => {
             acumulado: item.acumulado || false,
             ganhadores_15: item.ganhadores_15 || item.premiacoes?.[0]?.ganhadores || 0,
             valor_premio_15: item.valor_premio_15 || item.premiacoes?.[0]?.valorPremio || 0,
-            ganhadores_14: item.ganhadores_14 || 0,
-            valor_premio_14: item.valor_premio_14 || 0,
-            ganhadores_13: item.ganhadores_13 || 0,
-            valor_premio_13: item.valor_premio_13 || 0,
-            ganhadores_12: item.ganhadores_12 || 0,
-            ganhadores_11: item.ganhadores_11 || 0,
+            ganhadores_14: item.ganhadores_14 || 0, valor_premio_14: item.valor_premio_14 || 0,
+            ganhadores_13: item.ganhadores_13 || 0, valor_premio_13: item.valor_premio_13 || 0,
+            ganhadores_12: item.ganhadores_12 || 0, ganhadores_11: item.ganhadores_11 || 0,
           })).filter((s: Sorteio) => s.dezenas.length === 15)
             .sort((a: Sorteio, b: Sorteio) => a.concurso - b.concurso);
 
@@ -101,22 +98,52 @@ const Index = () => {
           setSorteios(sorteiosApi);
           setAnalise(analiseCalculada);
           toast.success(`Dados atualizados via API — ${sorteiosApi.length} concursos`);
+          return sorteiosApi;
         });
 
-    // Tenta API, se falhar usa dados locais
+    const conferirApostas = (sorteiosConferencia: Sorteio[]) => {
+      const saved = JSON.parse(localStorage.getItem('lotofacil-historico') || '[]') as HistoricoConjunto[];
+      const aguardando = saved.filter(h => h.status === 'aguardando');
+      if (aguardando.length === 0) return;
+
+      let atualizacoes = 0;
+      const novoHistorico = saved.map(item => {
+        if (item.status !== 'aguardando') return item;
+        const sorteioRealizado = sorteiosConferencia.find(s => s.concurso === item.concurso_alvo);
+        if (!sorteioRealizado) return item;
+
+        atualizacoes++;
+        const resultado = { acertos: { '11': 0, '12': 0, '13': 0, '14': 0, '15': 0 }, retorno_total: 0 };
+        item.conjunto.apostas.forEach(aposta => {
+          const acertos = aposta.dezenas.filter(d => sorteioRealizado.dezenas.includes(d)).length;
+          if (acertos >= 11) {
+            resultado.acertos[String(acertos)]++;
+            resultado.retorno_total += PREMIOS[acertos] || 0;
+          }
+        });
+        return { ...item, status: 'conferido' as const, resultado };
+      });
+
+      if (atualizacoes > 0) {
+        localStorage.setItem('lotofacil-historico', JSON.stringify(novoHistorico));
+        setHistoricoApostas(novoHistorico);
+        toast.info(`${atualizacoes} conjunto(s) de apostas foram conferidos!`);
+      }
+    };
+
     loadFromApi()
       .catch(() => {
         console.warn("API indisponível, usando dados locais");
         return loadFromLocal();
       })
-      .then(() => setLoading(false));
+      .then((sorteiosCarregados) => {
+        if (sorteiosCarregados) conferirApostas(sorteiosCarregados);
+      })
+      .finally(() => setLoading(false));
 
-    // Backtest sempre local
     fetch("/data/backtest_resultados.json").then(r => r.json()).then(setBacktestV2);
 
-    return () => {
-      workerRef.current?.terminate();
-    };
+    return () => { workerRef.current?.terminate(); };
   }, []);
 
   const nApostas = Math.floor(orcamento / 3.5);
@@ -133,15 +160,32 @@ const Index = () => {
     setConjunto(null);
 
     const workerInput: WorkerInput = {
-      estrategia,
-      nApostas,
-      analise,
+      estrategia, nApostas, analise,
       dezenasUltimoSorteio: sorteios[sorteios.length - 1].dezenas,
       manualUniverse: estrategia === "manual" ? manualUniverse : undefined,
       filtros,
     };
     workerRef.current.postMessage(workerInput);
   }, [sorteios, analise, estrategia, nApostas, manualUniverse, filtros]);
+
+  const handleSaveApostas = () => {
+    if (!conjunto || !ultimoSorteio) return;
+    const novoItem: HistoricoConjunto = {
+      id: Date.now(),
+      concurso_alvo: ultimoSorteio.concurso + 1,
+      data_salvo: new Date().toLocaleDateString('pt-BR'),
+      conjunto,
+      status: 'aguardando',
+    };
+    setHistoricoApostas([...historicoApostas, novoItem]);
+    toast.success(`Apostas para o concurso #${novoItem.concurso_alvo} salvas para conferência!`);
+  };
+
+  const handleDeleteAposta = (id: number) => {
+    if (window.confirm('Tem certeza que deseja apagar este conjunto de apostas?')) {
+      setHistoricoApostas(historicoApostas.filter(item => item.id !== id));
+    }
+  };
 
   const frequencias = sorteios.length > 0 ? calcularFrequencias(sorteios) : [];
   const paridade = sorteios.length > 0 ? calcularDistribuicaoParidade(sorteios) : [];
@@ -150,6 +194,7 @@ const Index = () => {
 
   const tabs: { id: Tab; label: string; icon: typeof Zap }[] = [
     { id: "gerar", label: "Gerar Apostas", icon: Zap },
+    { id: "minhas_apostas", label: "Minhas Apostas", icon: Bookmark },
     { id: "analise", label: "Análise", icon: BarChart3 },
     { id: "historico", label: "Histórico", icon: History },
     { id: "backtest", label: "Backtest", icon: FlaskConical },
@@ -160,7 +205,7 @@ const Index = () => {
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
           <Clover className="w-12 h-12 text-primary mx-auto mb-4 animate-pulse" />
-          <p className="font-mono text-muted-foreground">Carregando 3614 concursos...</p>
+          <p className="font-mono text-muted-foreground">Carregando concursos...</p>
         </div>
       </div>
     );
@@ -194,7 +239,7 @@ const Index = () => {
         </div>
       </header>
 
-      {/* Tabs - Sticky */}
+      {/* Tabs */}
       <nav className="border-b border-border bg-card/50 sticky top-0 z-40 backdrop-blur-sm">
         <div className="container max-w-6xl mx-auto px-4">
           <div className="flex gap-1 overflow-x-auto">
@@ -312,6 +357,16 @@ const Index = () => {
 
             {conjunto && (
               <>
+                <div className="text-center">
+                  <button
+                    onClick={handleSaveApostas}
+                    className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-secondary text-secondary-foreground font-mono text-xs transition-all hover:bg-primary/20"
+                  >
+                    <Bookmark className="w-4 h-4" />
+                    Salvar para Conferir
+                  </button>
+                </div>
+
                 <CoverageDisplay conjunto={conjunto} />
 
                 <div id="apostas-export" className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -337,6 +392,13 @@ const Index = () => {
                 </p>
               </div>
             </div>
+          </motion.div>
+        )}
+
+        {/* Tab: Minhas Apostas */}
+        {activeTab === "minhas_apostas" && (
+          <motion.div key="minhas_apostas" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+            <HistoricoApostas historico={historicoApostas} sorteios={sorteios} onDelete={handleDeleteAposta} />
           </motion.div>
         )}
 
