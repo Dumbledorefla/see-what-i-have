@@ -1,9 +1,10 @@
-import { useState, useEffect, useCallback, lazy, Suspense } from "react";
+import { useState, useEffect, useCallback, lazy, Suspense, useRef } from "react";
 import { motion } from "framer-motion";
 import { Zap, BarChart3, History, FlaskConical, AlertTriangle, Clover, Loader2, Settings } from "lucide-react";
 import { Toaster, toast } from "sonner";
 import { parseCsvCompleto, calcularFrequencias, calcularDistribuicaoParidade, calcularDistribuicaoSoma, type Sorteio, type AnaliseCompleta, type BacktestV2Result, type Filtros } from "@/lib/lotofacilData";
-import { gerarConjuntoOtimizado, type Estrategia, type ConjuntoOtimizado } from "@/lib/geradorApostas";
+import type { Estrategia, ConjuntoOtimizado } from "@/lib/geradorApostas";
+import type { WorkerInput, WorkerOutput } from "@/lib/generation.worker";
 import StatsOverview from "@/components/StatsOverview";
 import FrequencyChart from "@/components/FrequencyChart";
 import ParityChart from "@/components/ParityChart";
@@ -44,7 +45,23 @@ const Index = () => {
     humanidade_max: 80,
   });
 
+  // MELHORIA 2: Referência para o Worker
+  const workerRef = useRef<Worker | null>(null);
+
   useEffect(() => {
+    workerRef.current = new Worker(new URL("../lib/generation.worker.ts", import.meta.url), { type: "module" });
+
+    workerRef.current.onmessage = (e: MessageEvent<WorkerOutput>) => {
+      const { type, payload } = e.data;
+      if (type === "progress") {
+        setProgress(payload);
+      } else if (type === "result") {
+        setConjunto(payload);
+        setIsGenerating(false);
+        toast.success(`${payload.apostas.length} apostas geradas com ${payload.cobertura_final_pct.toFixed(1)}% de cobertura!`);
+      }
+    };
+
     Promise.all([
       fetch("/data/lotofacil_completo.csv").then(r => r.text()),
       fetch("/data/analise_completa.json").then(r => r.json()),
@@ -56,12 +73,16 @@ const Index = () => {
       setBacktestV2(btData);
       setLoading(false);
     });
+
+    return () => {
+      workerRef.current?.terminate();
+    };
   }, []);
 
   const nApostas = Math.floor(orcamento / 3.5);
 
   const handleGerar = useCallback(() => {
-    if (sorteios.length === 0 || !analise) return;
+    if (!workerRef.current || sorteios.length === 0 || !analise) return;
     if (estrategia === "manual" && manualUniverse.length < 18) {
       toast.error("Selecione pelo menos 18 dezenas para o universo manual.");
       return;
@@ -71,21 +92,15 @@ const Index = () => {
     setProgress(0);
     setConjunto(null);
 
-    setTimeout(() => {
-      const ultimo = sorteios[sorteios.length - 1];
-      const result = gerarConjuntoOtimizado(
-        estrategia,
-        nApostas,
-        analise,
-        ultimo.dezenas,
-        estrategia === "manual" ? manualUniverse : undefined,
-        (i, total) => setProgress(Math.round((i / total) * 100)),
-        filtros
-      );
-      setConjunto(result);
-      setIsGenerating(false);
-      toast.success(`${result.apostas.length} apostas geradas com ${result.cobertura_final_pct.toFixed(1)}% de cobertura!`);
-    }, 50);
+    const workerInput: WorkerInput = {
+      estrategia,
+      nApostas,
+      analise,
+      dezenasUltimoSorteio: sorteios[sorteios.length - 1].dezenas,
+      manualUniverse: estrategia === "manual" ? manualUniverse : undefined,
+      filtros,
+    };
+    workerRef.current.postMessage(workerInput);
   }, [sorteios, analise, estrategia, nApostas, manualUniverse, filtros]);
 
   const frequencias = sorteios.length > 0 ? calcularFrequencias(sorteios) : [];
