@@ -21,7 +21,7 @@ const BottomNav = () => (
           className={({ isActive }) =>
             cn(
               "flex flex-col items-center gap-0.5 px-2 py-1.5 text-[10px] font-medium transition-colors",
-              isActive ? "text-primary" : "text-muted-foreground"
+              isActive ? "text-accent" : "text-muted-foreground"
             )
           }
         >

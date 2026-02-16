@@ -16,7 +16,6 @@ const StatsOverview = ({ sorteios }: StatsOverviewProps) => {
     sorteios.reduce((acc, s) => acc + s.dezenas.filter(d => d % 2 === 0).length, 0) / sorteios.length
   ).toFixed(1);
 
-  // Average repetitions from previous draw
   let totalRepetitions = 0;
   for (let i = 1; i < sorteios.length; i++) {
     const prevSet = new Set(sorteios[i - 1].dezenas);
@@ -62,7 +61,7 @@ const StatsOverview = ({ sorteios }: StatsOverviewProps) => {
           className="stat-card"
         >
           <div className="flex items-center gap-2 mb-2">
-            <stat.icon className="w-4 h-4 text-primary" />
+            <stat.icon className="w-4 h-4 text-muted-foreground" />
             <span className="text-xs font-mono text-muted-foreground uppercase tracking-wider">
               {stat.label}
             </span>

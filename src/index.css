@@ -6,55 +6,58 @@
 
 @layer base {
   :root {
-    --background: 224 71% 4%;
+    --background: 222 47% 5%;
     --foreground: 210 40% 98%;
 
-    --card: 224 71% 8%;
+    --card: 222 47% 8%;
     --card-foreground: 210 40% 98%;
 
-    --popover: 224 71% 8%;
+    --popover: 222 47% 8%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 262 84% 60%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 210 40% 96%;
+    --primary-foreground: 222 47% 5%;
 
     --secondary: 217 33% 17%;
-    --secondary-foreground: 210 40% 78%;
+    --secondary-foreground: 210 40% 98%;
 
-    --muted: 217 33% 14%;
-    --muted-foreground: 215 20% 50%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 55%;
 
     --accent: 160 100% 39%;
-    --accent-foreground: 224 71% 4%;
+    --accent-foreground: 222 47% 5%;
 
-    --destructive: 0 72% 55%;
-    --destructive-foreground: 0 0% 100%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 210 40% 98%;
 
-    --border: 217 33% 22%;
-    --input: 217 33% 22%;
-    --ring: 262 84% 60%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 222 47% 5%;
+
+    --border: 217 33% 18%;
+    --input: 217 33% 18%;
+    --ring: 160 100% 39%;
 
     --radius: 1rem;
 
-    --sidebar-background: 224 71% 6%;
+    --sidebar-background: 222 47% 6%;
     --sidebar-foreground: 210 40% 98%;
-    --sidebar-primary: 262 84% 60%;
-    --sidebar-primary-foreground: 210 40% 98%;
+    --sidebar-primary: 160 100% 39%;
+    --sidebar-primary-foreground: 222 47% 5%;
     --sidebar-accent: 217 33% 17%;
     --sidebar-accent-foreground: 210 40% 98%;
-    --sidebar-border: 217 33% 22%;
-    --sidebar-ring: 262 84% 60%;
+    --sidebar-border: 217 33% 18%;
+    --sidebar-ring: 160 100% 39%;
 
     /* Custom tokens */
-    --glow-primary: 262 84% 60%;
+    --glow-primary: 160 100% 39%;
     --glow-accent: 160 100% 39%;
-    --surface-elevated: 224 50% 10%;
-    --surface-glass: 224 71% 8%;
-    --chart-1: 262 84% 60%;
-    --chart-2: 160 100% 39%;
-    --chart-3: 200 80% 55%;
-    --chart-4: 330 70% 60%;
-    --chart-5: 45 90% 55%;
+    --surface-elevated: 222 47% 10%;
+    --surface-glass: 222 47% 8%;
+    --chart-1: 160 100% 39%;
+    --chart-2: 262 84% 60%;
+    --chart-3: 38 92% 50%;
+    --chart-4: 200 80% 55%;
+    --chart-5: 330 70% 60%;
   }
 }
 
@@ -71,11 +74,11 @@
 
 @layer utilities {
   .glow-primary {
-    box-shadow: 0 0 20px hsl(262 84% 60% / 0.15), 0 0 60px hsl(262 84% 60% / 0.05);
+    box-shadow: 0 0 20px hsl(160 100% 39% / 0.12), 0 0 60px hsl(160 100% 39% / 0.04);
   }
 
   .glow-primary-strong {
-    box-shadow: 0 0 20px hsl(262 84% 60% / 0.3), 0 0 60px hsl(262 84% 60% / 0.1);
+    box-shadow: 0 0 20px hsl(160 100% 39% / 0.25), 0 0 60px hsl(160 100% 39% / 0.08);
   }
 
   .glow-accent {
@@ -83,7 +86,7 @@
   }
 
   .text-glow-primary {
-    text-shadow: 0 0 20px hsl(262 84% 60% / 0.5);
+    text-shadow: 0 0 20px hsl(160 100% 39% / 0.5);
   }
 
   .text-glow-accent {
@@ -91,19 +94,19 @@
   }
 
   .glass-card {
-    background: hsl(224 71% 8% / 0.8);
+    background: hsl(222 47% 8% / 0.8);
     backdrop-filter: blur(12px);
-    border: 1px solid hsl(217 33% 22% / 0.6);
+    border: 1px solid hsl(217 33% 18% / 0.6);
     border-radius: var(--radius);
   }
 
   .glass-card-hover:hover {
-    border-color: hsl(262 84% 60% / 0.3);
-    box-shadow: 0 0 30px hsl(262 84% 60% / 0.08);
+    border-color: hsl(160 100% 39% / 0.3);
+    box-shadow: 0 0 30px hsl(160 100% 39% / 0.06);
   }
 
   .gradient-border {
-    border-image: linear-gradient(135deg, hsl(262 84% 60%), hsl(160 100% 39%)) 1;
+    border-image: linear-gradient(135deg, hsl(160 100% 39%), hsl(262 84% 60%)) 1;
   }
 
   .number-ball {
@@ -111,25 +114,25 @@
   }
 
   .number-ball-active {
-    background: linear-gradient(135deg, hsl(262 84% 60%), hsl(262 84% 50%));
-    color: hsl(210 40% 98%);
-    box-shadow: 0 0 12px hsl(262 84% 60% / 0.4);
+    background: linear-gradient(135deg, hsl(160 100% 39%), hsl(160 100% 32%));
+    color: hsl(222 47% 5%);
+    box-shadow: 0 0 12px hsl(160 100% 39% / 0.4);
   }
 
   .number-ball-inactive {
     background: hsl(217 33% 17%);
-    color: hsl(215 20% 50%);
+    color: hsl(215 20% 55%);
   }
 
   .stat-card {
     @apply rounded-xl p-5 border transition-all duration-300;
-    background: hsl(224 71% 8% / 0.8);
+    background: hsl(222 47% 8% / 0.8);
     backdrop-filter: blur(12px);
-    border-color: hsl(217 33% 22% / 0.6);
+    border-color: hsl(217 33% 18% / 0.6);
   }
 
   .stat-card:hover {
-    border-color: hsl(262 84% 60% / 0.3);
-    box-shadow: 0 0 30px hsl(262 84% 60% / 0.05);
+    border-color: hsl(160 100% 39% / 0.3);
+    box-shadow: 0 0 30px hsl(160 100% 39% / 0.04);
   }
 }

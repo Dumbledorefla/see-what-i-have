@@ -38,16 +38,16 @@ const BetCardV3 = ({ aposta, dezenasSorteadas = [] }: BetCardV3Props) => {
         </div>
       )}
       <div className="flex items-center justify-between mb-3">
-        <h4 className="font-mono font-bold text-primary text-sm">
+        <h4 className="font-mono font-bold text-foreground text-sm">
           APOSTA #{String(aposta.id).padStart(2, "0")}
         </h4>
         <div className="flex items-center gap-2">
-          <span className={`text-xs font-mono px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20 ${isPremiada ? 'mr-16' : ''}`}>
+          <span className={`text-xs font-mono px-2 py-0.5 rounded-full bg-accent/10 text-accent border border-accent/20 ${isPremiada ? 'mr-16' : ''}`}>
             H:{aposta.humanidade_score}
           </span>
           <button
             onClick={handleCopy}
-            className="text-muted-foreground hover:text-primary transition-colors p-1"
+            className="text-muted-foreground hover:text-accent transition-colors p-1"
             title="Copiar dezenas"
           >
             {copied ? <Check className="w-3.5 h-3.5 text-accent" /> : <Copy className="w-3.5 h-3.5" />}

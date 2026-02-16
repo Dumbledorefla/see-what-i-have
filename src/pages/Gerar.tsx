@@ -85,7 +85,7 @@ const Gerar = () => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          <Zap className="w-6 h-6 inline-block mr-2 text-primary" />
+          <Zap className="w-6 h-6 inline-block mr-2 text-accent" />
           Gerar Apostas
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -145,7 +145,7 @@ const Gerar = () => {
         <button
           onClick={handleGerar}
           disabled={isGenerating || (estrategia === "manual" && manualUniverse.length < 18)}
-          className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-primary text-primary-foreground font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50 glow-primary-strong"
+          className="inline-flex items-center gap-2 px-8 py-3 rounded-lg bg-accent text-accent-foreground font-bold text-sm transition-all hover:opacity-90 disabled:opacity-50 glow-primary-strong"
         >
           {isGenerating ? (
             <><Loader2 className="w-4 h-4 animate-spin" /> Gerando... {progress}%</>
@@ -165,7 +165,7 @@ const Gerar = () => {
           <div className="text-center">
             <button
               onClick={handleSaveApostas}
-              className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-secondary text-secondary-foreground font-mono text-xs transition-all hover:bg-primary/20"
+              className="inline-flex items-center gap-2 px-6 py-2 rounded-lg bg-secondary text-secondary-foreground font-mono text-xs transition-all hover:bg-secondary/80"
             >
               <Bookmark className="w-4 h-4" /> Salvar para Conferir
             </button>

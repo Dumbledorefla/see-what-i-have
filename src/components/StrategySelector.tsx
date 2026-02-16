@@ -22,12 +22,12 @@ const StrategySelector = ({ value, onChange }: StrategySelectorProps) => {
           onClick={() => onChange(s.id)}
           className={`stat-card text-left transition-all p-4 ${
             value === s.id
-              ? "!border-primary glow-primary"
+              ? "!border-accent glow-primary"
               : "hover:border-muted-foreground/30"
           }`}
         >
-          <s.icon className={`w-5 h-5 mb-2 ${value === s.id ? "text-primary" : "text-muted-foreground"}`} />
-          <p className={`font-mono font-bold text-sm ${value === s.id ? "text-primary" : "text-foreground"}`}>
+          <s.icon className={`w-5 h-5 mb-2 ${value === s.id ? "text-accent" : "text-muted-foreground"}`} />
+          <p className={`font-mono font-bold text-sm ${value === s.id ? "text-accent" : "text-foreground"}`}>
             {s.label}
           </p>
           <p className="text-xs text-muted-foreground mt-1">{s.desc}</p>

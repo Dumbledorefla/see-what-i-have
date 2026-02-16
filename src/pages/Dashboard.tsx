@@ -31,7 +31,7 @@ const Dashboard = () => {
       {/* Page header */}
       <motion.div variants={item}>
         <h1 className="text-2xl font-bold tracking-tight">
-          <LayoutDashboard className="w-6 h-6 inline-block mr-2 text-primary" />
+          <LayoutDashboard className="w-6 h-6 inline-block mr-2 text-muted-foreground" />
           Dashboard
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -44,10 +44,10 @@ const Dashboard = () => {
         <motion.div variants={item}>
           <GlassCard className="h-full">
             <div className="flex items-center gap-2 mb-2">
-              <Hash className="w-4 h-4 text-primary" />
+              <Hash className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs font-mono text-muted-foreground uppercase">Próximo Concurso</span>
             </div>
-            <p className="text-3xl font-mono font-bold text-primary">
+            <p className="text-3xl font-mono font-bold text-foreground">
               #{ultimoSorteio.concurso + 1}
             </p>
             <p className="text-xs text-muted-foreground mt-1">Baseado no último resultado</p>
@@ -57,7 +57,7 @@ const Dashboard = () => {
         <motion.div variants={item}>
           <GlassCard className="h-full">
             <div className="flex items-center gap-2 mb-2">
-              <Award className="w-4 h-4 text-accent" />
+              <Award className="w-4 h-4 text-muted-foreground" />
               <span className="text-xs font-mono text-muted-foreground uppercase">Último Resultado</span>
             </div>
             <p className="text-3xl font-mono font-bold text-foreground">
@@ -99,7 +99,7 @@ const Dashboard = () => {
       {/* Last draw grid */}
       <motion.div variants={item}>
         <GlassCard>
-          <h3 className="font-mono font-bold text-primary mb-3 text-sm">ÚLTIMO SORTEIO — #{ultimoSorteio.concurso}</h3>
+          <h3 className="font-mono font-bold text-foreground mb-3 text-sm">ÚLTIMO SORTEIO — #{ultimoSorteio.concurso}</h3>
           <NumberGrid activeNumbers={ultimoSorteio.dezenas} />
         </GlassCard>
       </motion.div>
@@ -111,8 +111,8 @@ const Dashboard = () => {
           className="w-full glass-card glass-card-hover p-6 text-left group transition-transform hover:scale-[1.02] duration-200"
         >
           <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 transition-colors">
-              <Zap className="w-6 h-6 text-primary" />
+            <div className="w-12 h-12 rounded-xl bg-accent/20 flex items-center justify-center group-hover:bg-accent/30 transition-colors">
+              <Zap className="w-6 h-6 text-accent" />
             </div>
             <div>
               <h3 className="font-bold text-lg text-foreground">Gerar Apostas Otimizadas</h3>

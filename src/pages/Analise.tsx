@@ -18,7 +18,7 @@ const Analise = () => {
     <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
       <div>
         <h1 className="text-2xl font-bold tracking-tight">
-          <BarChart3 className="w-6 h-6 inline-block mr-2 text-primary" />
+          <BarChart3 className="w-6 h-6 inline-block mr-2 text-muted-foreground" />
           Análise Estatística
         </h1>
         <p className="text-muted-foreground text-sm mt-1">
@@ -35,7 +35,7 @@ const Analise = () => {
 
       <div className="grid md:grid-cols-2 gap-6">
         <div className="stat-card">
-          <h3 className="font-mono font-bold text-primary text-lg mb-1">TOP 10 — MAIS FREQUENTES</h3>
+          <h3 className="font-mono font-bold text-foreground text-lg mb-1">TOP 10 — MAIS FREQUENTES</h3>
           <p className="text-muted-foreground text-sm mb-4">
             Números com maior aparição em {sorteios.length} concursos
           </p>
@@ -54,7 +54,7 @@ const Analise = () => {
                         initial={{ width: 0 }}
                         animate={{ width: `${f.percentual}%` }}
                         transition={{ delay: i * 0.05, duration: 0.5 }}
-                        className="h-full rounded-full bg-primary"
+                        className="h-full rounded-full bg-accent"
                       />
                     </div>
                   </div>
